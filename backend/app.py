@@ -16,11 +16,11 @@ collection = db["myCollection"]
 
 # Google Drive file IDs for re-saved models
 gdrive_files = {
-    "flu_model_inf_a_v2.pkl": "1wRR3FFUNF7HJQIKwsqRYy4Bh6_0pzim-",
-    "flu_model_inf_all_v2.pkl": "1VrX4Vlkar1v4VtCxSfTck9nrjUH5xcxQ",
-    "flu_model_inf_b_v2.pkl": "1sDUG26NpUNwC9DOnCo96tgHZBsP6yE87",
-    "flu_model_otherrespvirus_v2.pkl": "1e9qrmf2VL8HvbWMiaBOArHCueQNqtwnn",
-    "flu_model_rsv_v2.pkl": "1RI1l1pFRuw0Dq8zhO96X7TfKCFdtCi2J"
+    "flu_model_inf_a_v2.pkl": "1mKrTSyY_qQSeO2Ogtn-OiTabQJlwpcre",
+    "flu_model_inf_all_v2.pkl": "1yPJo5sFKEBe4IDaXSGfRQhlSDvVP2XrF",
+    "flu_model_inf_b_v2.pkl": "1wyyWjlWIxOUnlVoBUlIeEbbQWxjuBZao",
+    "flu_model_otherrespvirus_v2.pkl": "1y-sa-tvvVvEryhiGnXIxjM7NPUpQCswQ",
+    "flu_model_rsv_v2.pkl": "1taWvduuc2B7GCO8VZZUfhWv-sZD_Ui4N"
 }
 
 def download_model_file(filename, file_id):
@@ -97,4 +97,5 @@ def serve_react(path):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
