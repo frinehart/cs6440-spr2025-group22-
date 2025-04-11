@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: cs6440-flu-dashboard
+    env: docker
+    plan: free
+    region: oregon
+    dockerfilePath: Dockerfile
+    buildCommand: ""
+    startCommand: "python app.py"
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_RUN_PORT
+        value: 5000
+    healthCheckPath: /
