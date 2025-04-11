@@ -4,15 +4,41 @@ from pymongo import MongoClient
 import joblib
 import numpy as np
 import os
-
+import requests
 
 app = Flask(__name__, static_folder="build")
-CORS(app)  # Enable frontend requests (like from React)
+CORS(app)
 
 # Connect to MongoDB
 client = MongoClient("mongodb://my-mongo:27017/")
 db = client["myDatabase"]
 collection = db["myCollection"]
+
+# Google Drive file IDs for model files
+gdrive_files = {
+    "flu_model_inf_a.pkl": "1Fg0yuWG72OjEYI8XFeF1-gfNelyUphS1",
+    "flu_model_inf_all.pkl": "1fgYrwbFPDNOm3wxwkDeFvna70-Ywhheu",
+    "flu_model_inf_b.pkl": "1xVj_mGcyvjo4tRCP1zCf5Vy94_cXWpZ5",
+    "flu_model_otherrespvirus.pkl": "1oDvVydfST_LzRblF2gREWRYKalgwRjFV",
+    "flu_model_rsv.pkl": "1yhrPWsCQlEWgbCqKQQboMuaYpRQhndJC"
+}
+
+def download_model_file(filename, file_id):
+    """Download file from Google Drive if it doesn't exist locally."""
+    if not os.path.exists(filename):
+        print(f"Downloading {filename}...")
+        url = f"https://drive.google.com/uc?export=download&id={file_id}"
+        response = requests.get(url, allow_redirects=True)
+        if response.status_code == 200:
+            with open(filename, 'wb') as f:
+                f.write(response.content)
+            print(f"Downloaded {filename}")
+        else:
+            raise Exception(f"Failed to download {filename} (status: {response.status_code})")
+
+# Ensure all model files are downloaded
+for file_name, file_id in gdrive_files.items():
+    download_model_file(file_name, file_id)
 
 # Load ML models for predictions
 models = {
@@ -71,3 +97,4 @@ def serve_react(path):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
