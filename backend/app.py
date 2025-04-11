@@ -16,12 +16,13 @@ collection = db["myCollection"]
 
 # Google Drive file IDs for re-saved models
 gdrive_files = {
-    "flu_model_inf_a_v2.pkl": "1mKrTSyY_qQSeO2Ogtn-OiTabQJlwpcre",
-    "flu_model_inf_all_v2.pkl": "1yPJo5sFKEBe4IDaXSGfRQhlSDvVP2XrF",
-    "flu_model_inf_b_v2.pkl": "1wyyWjlWIxOUnlVoBUlIeEbbQWxjuBZao",
-    "flu_model_otherrespvirus_v2.pkl": "1y-sa-tvvVvEryhiGnXIxjM7NPUpQCswQ",
-    "flu_model_rsv_v2.pkl": "1taWvduuc2B7GCO8VZZUfhWv-sZD_Ui4N"
+    "flu_model_inf_a_v2.pkl": "1BU9D9ZtVoapVoncZAAU77McLSURKjo9L",
+    "flu_model_inf_all_v2.pkl": "18LtTG1bmvp5Ptm3m3r5zmSmIYTsDDF8u",
+    "flu_model_inf_b_v2.pkl": "151aAwg68fcWx9digVK6PbYHgbR5beGhR",
+    "flu_model_rsv_v2.pkl": "1MsspB1pXMQJuvyCagPeFj6NuR9n0xTDC",
+    "flu_model_otherrespvirus_v2.pkl": "1hpR1hyckuDshfCQ0REWm6TPZeF6uUqEa"
 }
+
 
 def download_model_file(filename, file_id):
     """Download file from Google Drive if it doesn't exist locally."""
