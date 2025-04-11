@@ -24,17 +24,36 @@ gdrive_files = {
 }
 
 def download_model_file(filename, file_id):
-    """Download file from Google Drive if it doesn't exist locally."""
-    if not os.path.exists(filename):
-        print(f"Downloading {filename}...")
-        url = f"https://drive.google.com/uc?export=download&id={file_id}"
-        response = requests.get(url, allow_redirects=True)
-        if response.status_code == 200:
-            with open(filename, 'wb') as f:
-                f.write(response.content)
-            print(f"Downloaded {filename}")
-        else:
-            raise Exception(f"Failed to download {filename} (status: {response.status_code})")
+    """Download large Google Drive files with confirmation token handling."""
+    if os.path.exists(filename):
+        return
+
+    print(f"Downloading {filename} from Google Drive...")
+    URL = "https://docs.google.com/uc?export=download"
+
+    session = requests.Session()
+    response = session.get(URL, params={"id": file_id}, stream=True)
+    token = get_confirm_token(response)
+
+    if token:
+        params = {"id": file_id, "confirm": token}
+        response = session.get(URL, params=params, stream=True)
+
+    save_response_content(response, filename)
+    print(f"Downloaded {filename} ✅")
+
+def get_confirm_token(response):
+    for key, value in response.cookies.items():
+        if key.startswith("download_warning"):
+            return value
+    return None
+
+def save_response_content(response, destination):
+    CHUNK_SIZE = 32768
+    with open(destination, "wb") as f:
+        for chunk in response.iter_content(CHUNK_SIZE):
+            if chunk:
+                f.write(chunk)
 
 # Ensure all model files are downloaded
 for file_name, file_id in gdrive_files.items():
@@ -97,4 +116,3 @@ def serve_react(path):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
