@@ -1,32 +1,21 @@
-<<<<<<< HEAD
 FROM python:3.11-slim
 
 WORKDIR /app
 
+# Install Python dependencies
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy backend source code
 COPY backend/ .
 
+# Copy frontend production build
 COPY react-ui/cs6440-group-22/build /app/build
 
+# Set environment variable for Flask
 ENV FLASK_APP=app.py
-=======
-FROM python:3.11
 
-WORKDIR /app
-
-# Copy backend app code
-COPY backend/ .  
-
-# Install dependencies
-COPY backend/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy frontend build into /app/build
-COPY react-ui/cs6440-group-22/build ./build
->>>>>>> 8934f0ea17ff472dc4f3935e22acf817b327d842
-
+# Start the Flask app
 CMD ["python", "app.py"]
 
 
