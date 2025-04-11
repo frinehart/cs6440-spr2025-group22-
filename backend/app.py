@@ -14,15 +14,14 @@ client = MongoClient("mongodb://my-mongo:27017/")
 db = client["myDatabase"]
 collection = db["myCollection"]
 
-# Google Drive file IDs for re-saved models
+# Updated Google Drive file IDs for re-saved models
 gdrive_files = {
-    "flu_model_inf_a_v2.pkl": "1BU9D9ZtVoapVoncZAAU77McLSURKjo9L",
-    "flu_model_inf_all_v2.pkl": "18LtTG1bmvp5Ptm3m3r5zmSmIYTsDDF8u",
-    "flu_model_inf_b_v2.pkl": "151aAwg68fcWx9digVK6PbYHgbR5beGhR",
-    "flu_model_rsv_v2.pkl": "1MsspB1pXMQJuvyCagPeFj6NuR9n0xTDC",
-    "flu_model_otherrespvirus_v2.pkl": "1hpR1hyckuDshfCQ0REWm6TPZeF6uUqEa"
+    "flu_model_inf_a_v2.pkl": "1bds3Ec6ySuQVjQCy6-RlM-4Jjqwd-7Qt",
+    "flu_model_inf_all_v2.pkl": "18dbNwD5vrc9Ii8opnI8WnAFbDwtshkjL",
+    "flu_model_inf_b_v2.pkl": "1ywYE8V54uFBYt1rWSliGZvWsTwJU2Auj",
+    "flu_model_otherrespvirus_v2.pkl": "1YM3hHu_6g97EdQUZQjuYkHbAoU64ED4p",
+    "flu_model_rsv_v2.pkl": "10O6Pp8mb41-Ol6cEq799NOFfj2uwSOTo"
 }
-
 
 def download_model_file(filename, file_id):
     """Download file from Google Drive if it doesn't exist locally."""
@@ -98,5 +97,6 @@ def serve_react(path):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
