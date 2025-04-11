@@ -1,0 +1,25 @@
+version: '3.9'
+
+services:
+  flask-api:
+    container_name: flask-api
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app          
+      - ./data:/app/data        
+    depends_on:
+      - my-mongo
+
+  my-mongo:
+    image: mongo:latest
+    container_name: my-mongo
+    ports:
+      - "27017:27017"
+
+
+
+
