@@ -61,11 +61,11 @@ for file_name, file_id in gdrive_files.items():
 
 # Load ML models for predictions
 models = {
-    "inf_a": joblib.load("flu_model_inf_a.pkl"),
-    "inf_b": joblib.load("flu_model_inf_b.pkl"),
-    "inf_all": joblib.load("flu_model_inf_all.pkl"),
-    "rsv": joblib.load("flu_model_rsv.pkl"),
-    "otherrespvirus": joblib.load("flu_model_otherrespvirus.pkl")
+    "inf_a": joblib.load("backend/flu_model_inf_a_v2.pkl"),
+    "inf_b": joblib.load("backend/flu_model_inf_b_v2.pkl"),
+    "inf_all": joblib.load("backend/flu_model_inf_all_v2.pkl"),
+    "rsv": joblib.load("backend/flu_model_rsv_v2.pkl"),
+    "otherrespvirus": joblib.load("backend/flu_model_otherrespvirus_v2.pkl")
 }
 
 region_mapping = {
