@@ -10,7 +10,7 @@ app = Flask(__name__, static_folder="build")
 CORS(app)
 
 # Connect to MongoDB
-client = MongoClient("mongodb://my-mongo:27017/")
+client = MongoClient("mongodb://my-mongo:27017/", serverSelectionTimeoutMS=5000)
 db = client["myDatabase"]
 collection = db["myCollection"]
 
