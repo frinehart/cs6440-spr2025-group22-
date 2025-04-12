@@ -4,44 +4,22 @@ FROM python:3.11-slim
 # Create app directory
 WORKDIR /app
 
-# Copy backend requirements first for caching
+# Install Python dependencies
 COPY backend/requirements.txt .
-
-# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend source code
+# Copy backend source
 COPY backend/ .
 
-# Copy React frontend source code and build it
-COPY react-ui/cs6440-group-22 ./react-ui
-WORKDIR /app/react-ui
+# Copy and build React app
+COPY react-ui/ ./react-ui
+WORKDIR /app/react-ui/cs6440-group-22
 RUN npm install && npm run build
 
-# Move back to backend to serve React build
+# Move build into Flask static folder
 WORKDIR /app
-RUN cp -r react-ui/build ./build
+RUN cp -r react-ui/cs6440-group-22/build ./build
 
-# Expose Flask port
+# Expose port and run Flask
 EXPOSE 5000
-
-# Start Flask
 CMD ["python", "app.py"]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
