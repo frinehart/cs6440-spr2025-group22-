@@ -1,21 +1,26 @@
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from pymongo import MongoClient
+from urllib.parse import quote_plus
 import joblib
 import numpy as np
 import os
 import requests
 
-# ✅ Set static_folder to the React build directory (inside the container)
+# ✅ Serve from React build directory
 app = Flask(__name__, static_folder="build", static_url_path="")
 CORS(app)
 
-# Connect to MongoDB
-client = MongoClient("mongodb://my-mongo:27017/", serverSelectionTimeoutMS=5000)
+# ✅ Connect to MongoDB Atlas using env vars
+MONGO_USER = quote_plus(os.getenv("MONGO_USER", "fsrinehart"))
+MONGO_PASS = quote_plus(os.getenv("MONGO_PASS", "1Banana!"))
+MONGO_URI = f"mongodb+srv://{MONGO_USER}:{MONGO_PASS}@cluster0.bwalegq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+
+client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
 db = client["myDatabase"]
 collection = db["myCollection"]
 
-# ✅ Updated Google Drive file IDs for re-saved models (v2 using protocol=4)
+# ✅ Google Drive file IDs for models (v2)
 gdrive_files = {
     "flu_model_inf_a_v2.pkl": "1zTQjJV1Tdo_nCtpCM7rP8e6wIjEG_A7j",
     "flu_model_inf_all_v2.pkl": "15ZxnYML2SWJja5xTTouRo2GiN49Hr7XI",
@@ -25,9 +30,9 @@ gdrive_files = {
 }
 
 def download_model_file(filename, file_id):
-    """Download file from Google Drive if it doesn't exist locally."""
+    """Download file from Google Drive if not cached."""
     if not os.path.exists(filename):
-        print(f"📥 Downloading {filename} from Google Drive...")
+        print(f"📥 Downloading {filename}...")
         url = f"https://drive.google.com/uc?export=download&id={file_id}"
         response = requests.get(url, allow_redirects=True)
         if response.status_code == 200:
@@ -37,11 +42,11 @@ def download_model_file(filename, file_id):
         else:
             raise Exception(f"❌ Failed to download {filename} (status: {response.status_code})")
 
-# Download model files if needed
+# ✅ Download models if needed
 for fname, fid in gdrive_files.items():
     download_model_file(fname, fid)
 
-# Load models
+# ✅ Load models
 models = {
     "inf_a": joblib.load("flu_model_inf_a_v2.pkl"),
     "inf_b": joblib.load("flu_model_inf_b_v2.pkl"),
@@ -88,7 +93,7 @@ def predict_flu_cases():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# ✅ Serve React app from root
+# ✅ Serve the React frontend
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def serve_react(path):
@@ -99,3 +104,4 @@ def serve_react(path):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
