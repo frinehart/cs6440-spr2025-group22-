@@ -1,19 +1,16 @@
-# Use a Python base image
+# Use slim Python base
 FROM python:3.11-slim
 
-# Set working directory
+# Create app directory
 WORKDIR /app
 
-# Install system dependencies (includes Node.js and npm)
-RUN apt-get update && \
-    apt-get install -y curl gnupg nodejs npm && \
-    rm -rf /var/lib/apt/lists/*
-
-# Copy backend dependencies and install them
+# Copy backend requirements first for caching
 COPY backend/requirements.txt .
+
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend code
+# Copy backend source code
 COPY backend/ .
 
 # Copy React frontend source code and build it
@@ -21,17 +18,16 @@ COPY react-ui/cs6440-group-22 ./react-ui
 WORKDIR /app/react-ui
 RUN npm install && npm run build
 
-# Move React build into Flask static folder
-RUN cp -r build ../build
-
-# Return to backend app directory
+# Move back to backend to serve React build
 WORKDIR /app
+RUN cp -r react-ui/build ./build
 
 # Expose Flask port
 EXPOSE 5000
 
-# Run the app
+# Start Flask
 CMD ["python", "app.py"]
+
 
 
 
