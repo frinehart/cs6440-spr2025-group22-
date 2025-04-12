@@ -14,10 +14,12 @@ CORS(app)
 # ✅ Connect to MongoDB Atlas using env vars
 MONGO_USER = quote_plus(os.getenv("MONGO_USER", "fsrinehart"))
 MONGO_PASS = quote_plus(os.getenv("MONGO_PASS", "1Banana!"))
-MONGO_URI = f"mongodb+srv://{MONGO_USER}:{MONGO_PASS}@cluster0.bwalegq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+MONGO_DBNAME = os.getenv("MONGO_DBNAME", "myDatabase")
+
+MONGO_URI = f"mongodb+srv://{MONGO_USER}:{MONGO_PASS}@cluster0.bwalegq.mongodb.net/{MONGO_DBNAME}?retryWrites=true&w=majority&appName=Cluster0"
 
 client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
-db = client["myDatabase"]
+db = client[MONGO_DBNAME]
 collection = db["myCollection"]
 
 # ✅ Google Drive file IDs for models (v2)
@@ -104,4 +106,5 @@ def serve_react(path):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
