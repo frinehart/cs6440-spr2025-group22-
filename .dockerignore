@@ -23,8 +23,15 @@ Thumbs.db
 .git/
 .gitignore
 
-# React dev artifacts (we'll copy only the build folder)
+# ✅ Keep backend code and frontend build
+# ✅ Only ignore dev folders, not build output
+
+# React dev artifacts — OK to ignore
 react-ui/cs6440-group-22/public/
 react-ui/cs6440-group-22/src/
 
+# ✅ Make sure build folder is NOT ignored
+# ❌ DO NOT include: react-ui/cs6440-group-22/build/
+
+# Ignore source maps
 **/*.map
