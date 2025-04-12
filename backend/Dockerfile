@@ -1,4 +1,5 @@
-# Use a Python base image
+# backend/Dockerfile
+
 FROM python:3.11-slim
 
 # Set working directory
@@ -11,17 +12,18 @@ RUN apt-get update && apt-get install -y curl gnupg && rm -rf /var/lib/apt/lists
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend code
+# Copy backend app code
 COPY backend/ .
 
-# ✅ Copy prebuilt React frontend into /app/build for Flask to serve
+# ✅ Copy React build into Flask static directory
 COPY react-ui/cs6440-group-22/build ./build
 
 # Expose Flask port
 EXPOSE 5000
 
-# Run the app
+# Run Flask app
 CMD ["python", "app.py"]
+
 
 
 
