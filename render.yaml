@@ -4,9 +4,10 @@ services:
     env: docker
     plan: free
     region: oregon
-    dockerfilePath: backend/Dockerfile
+    dockerfilePath: Dockerfile
     dockerContext: .
-    startCommand: "python app.py"
+    startCommand: "python backend/app.py"
+
     healthCheckPath: /
 
     envVars:
