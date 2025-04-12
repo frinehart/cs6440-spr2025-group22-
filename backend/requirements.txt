@@ -1,7 +1,8 @@
+scikit-learn==1.2.2
 flask
 flask-cors
 pymongo
 joblib
-scikit-learn
 pandas
 gdown
+
