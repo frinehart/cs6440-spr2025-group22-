@@ -6,7 +6,8 @@ import numpy as np
 import os
 import requests
 
-app = Flask(__name__, static_folder="build")
+# ✅ Set static_folder to the React build directory (inside the container)
+app = Flask(__name__, static_folder="build", static_url_path="")
 CORS(app)
 
 # Connect to MongoDB
@@ -40,7 +41,7 @@ def download_model_file(filename, file_id):
 for fname, fid in gdrive_files.items():
     download_model_file(fname, fid)
 
-# Load models after confirming files exist
+# Load models
 models = {
     "inf_a": joblib.load("flu_model_inf_a_v2.pkl"),
     "inf_b": joblib.load("flu_model_inf_b_v2.pkl"),
@@ -49,7 +50,7 @@ models = {
     "otherrespvirus": joblib.load("flu_model_otherrespvirus_v2.pkl")
 }
 
-# Region encoding mapping
+# Region encoding
 region_mapping = {
     'AFR': 0, 'AMR': 1, 'EMR': 2, 'EUR': 3, 'SEAR': 4, 'WPR': 5, 'Other': 6
 }
@@ -87,20 +88,14 @@ def predict_flu_cases():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# ✅ Fixed path to build directory
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
+# ✅ Serve React app from root
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
 def serve_react(path):
-    build_dir = os.path.join(os.path.dirname(__file__), '..', 'react-ui', 'build')
-    if path != "" and os.path.exists(os.path.join(build_dir, path)):
-        return send_from_directory(build_dir, path)
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
     else:
-        return send_from_directory(build_dir, 'index.html')
+        return send_from_directory(app.static_folder, "index.html")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
-
-
-
-

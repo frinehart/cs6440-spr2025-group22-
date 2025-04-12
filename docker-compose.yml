@@ -9,8 +9,8 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./backend:/app          
-      - ./data:/app/data        
+      - ./backend:/app           # For your app source code
+      - ./data:/app/data         # ✅ Ensures the CSV is visible to the container
     depends_on:
       - my-mongo
 
@@ -19,6 +19,8 @@ services:
     container_name: my-mongo
     ports:
       - "27017:27017"
+
+
 
 
 

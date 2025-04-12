@@ -1,0 +1,30 @@
+# Ignore Python cache and virtual envs
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+.env
+model_env/
+
+# Ignore node_modules in any folder
+**/node_modules
+
+# Ignore other common large or build-related files
+*.sqlite3
+*.db
+*.pkl
+*.h5
+.DS_Store
+Thumbs.db
+
+# Ignore system files and Git
+.vscode/
+.git/
+.gitignore
+
+# React dev artifacts (we'll copy only the build folder)
+react-ui/cs6440-group-22/public/
+react-ui/cs6440-group-22/src/
+
+**/*.map
