@@ -14,13 +14,13 @@ client = MongoClient("mongodb://my-mongo:27017/", serverSelectionTimeoutMS=5000)
 db = client["myDatabase"]
 collection = db["myCollection"]
 
-# Updated Google Drive file IDs for re-saved models
+# ✅ Updated Google Drive file IDs for re-saved models (v2 using protocol=4)
 gdrive_files = {
-    "flu_model_inf_a_v2.pkl": "1bds3Ec6ySuQVjQCy6-RlM-4Jjqwd-7Qt",
-    "flu_model_inf_all_v2.pkl": "18dbNwD5vrc9Ii8opnI8WnAFbDwtshkjL",
-    "flu_model_inf_b_v2.pkl": "1ywYE8V54uFBYt1rWSliGZvWsTwJU2Auj",
-    "flu_model_otherrespvirus_v2.pkl": "1YM3hHu_6g97EdQUZQjuYkHbAoU64ED4p",
-    "flu_model_rsv_v2.pkl": "10O6Pp8mb41-Ol6cEq799NOFfj2uwSOTo"
+    "flu_model_inf_a_v2.pkl": "1zTQjJV1Tdo_nCtpCM7rP8e6wIjEG_A7j",
+    "flu_model_inf_all_v2.pkl": "15ZxnYML2SWJja5xTTouRo2GiN49Hr7XI",
+    "flu_model_inf_b_v2.pkl": "1gtBlaikJU9NXCMO71srohiWnnVJx-xq3",
+    "flu_model_otherrespvirus_v2.pkl": "1jryMeOAlaq8xQqkRhF-H2Us3Ck8MQWmh",
+    "flu_model_rsv_v2.pkl": "14rHJg2GZCHPzjsCeBdXKw1nNF3KMmclG"
 }
 
 def download_model_file(filename, file_id):
@@ -34,13 +34,13 @@ def download_model_file(filename, file_id):
                 f.write(response.content)
             print(f"✅ Downloaded {filename}")
         else:
-            raise Exception(f"Failed to download {filename} (status: {response.status_code})")
+            raise Exception(f"❌ Failed to download {filename} (status: {response.status_code})")
 
-# Download and load models
-models = {}
+# Download model files if needed
 for fname, fid in gdrive_files.items():
     download_model_file(fname, fid)
 
+# Load models after confirming files exist
 models = {
     "inf_a": joblib.load("flu_model_inf_a_v2.pkl"),
     "inf_b": joblib.load("flu_model_inf_b_v2.pkl"),
@@ -49,6 +49,7 @@ models = {
     "otherrespvirus": joblib.load("flu_model_otherrespvirus_v2.pkl")
 }
 
+# Region encoding mapping
 region_mapping = {
     'AFR': 0, 'AMR': 1, 'EMR': 2, 'EUR': 3, 'SEAR': 4, 'WPR': 5, 'Other': 6
 }
@@ -97,6 +98,7 @@ def serve_react(path):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
