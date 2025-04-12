@@ -1,19 +1,25 @@
+# Use official Python image
 FROM python:3.11-slim
 
+# Set working directory
 WORKDIR /app
 
 # Install dependencies
-COPY requirements.txt .
-
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy all app code
-COPY . .
+# Copy backend code
+COPY backend/ .
 
-# Set environment variables
-ENV FLASK_APP=app.py
+# ✅ Copy frontend build
+COPY react-ui/cs6440-group-22/build/ ./react-ui/cs6440-group-22/build/
 
+# Expose the app port
+EXPOSE 5000
+
+# Run the app
 CMD ["python", "app.py"]
+
 
 
 

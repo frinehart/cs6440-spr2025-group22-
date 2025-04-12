@@ -87,10 +87,11 @@ def predict_flu_cases():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# ✅ Fixed path to build directory
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_react(path):
-    build_dir = os.path.join(os.path.dirname(__file__), '..', 'react-ui', 'cs6440-group-22', 'build')
+    build_dir = os.path.join(os.path.dirname(__file__), '..', 'react-ui', 'build')
     if path != "" and os.path.exists(os.path.join(build_dir, path)):
         return send_from_directory(build_dir, path)
     else:
@@ -98,6 +99,7 @@ def serve_react(path):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
