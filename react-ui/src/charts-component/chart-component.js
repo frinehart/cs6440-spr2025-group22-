@@ -85,7 +85,7 @@ const ChartComponent = () => {
       {/* Legend */}
       <div style={{ marginBottom: "20px" }}>
         <strong>Flu Type Color Legend:</strong>
-        <div style={{ display: "flex", gap: "15px", marginTop: "8px" }}>
+        <div style={{ display: "flex", gap: "15px", marginTop: "8px", flexWrap: "wrap", justifyContent: "center" }}>
           {Object.entries(fluColors).map(([type, color]) => (
             <div key={type} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <div style={{ width: "16px", height: "16px", backgroundColor: color, borderRadius: "3px" }}></div>
@@ -96,31 +96,34 @@ const ChartComponent = () => {
       </div>
 
       {/* Chart */}
-      {data ? (
-        <Bar
-          data={data}
-          options={{
-            responsive: true,
-            plugins: {
-              legend: { display: true },
-              title: {
-                display: true,
-                text: `Cases of ${selectedFlu.toUpperCase()} by WHO Region`
-              }
-            },
-            scales: {
-              y: {
-                beginAtZero: true,
-                ticks: {
-                  precision: 0
+      <div className="chart-container">
+        {data ? (
+          <Bar
+            data={data}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: true },
+                title: {
+                  display: true,
+                  text: `Cases of ${selectedFlu.toUpperCase()} by WHO Region`
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    precision: 0
+                  }
                 }
               }
-            }
-          }}
-        />
-      ) : (
-        <p>Loading chart...</p>
-      )}
+            }}
+          />
+        ) : (
+          <p>Loading chart...</p>
+        )}
+      </div>
 
       {/* Summary */}
       <div style={{ marginTop: "30px", textAlign: "left" }}>
@@ -135,6 +138,7 @@ const ChartComponent = () => {
 };
 
 export default ChartComponent;
+
 
 
 
