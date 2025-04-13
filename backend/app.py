@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
-from pymongo import MongoClient
+import pandas as pd
 import joblib
 import numpy as np
 import os
@@ -10,13 +10,11 @@ import requests
 app = Flask(__name__, static_folder="build", static_url_path="")
 CORS(app)
 
-# ✅ Use direct MongoDB connection string (from MONGO_URI env var)
-MONGO_URI = os.getenv("MONGO_URI")
-client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
-db = client["myDatabase"]
-collection = db["myCollection"]
+# ✅ Load CSV file into memory
+CSV_PATH = "data/VIW_FNT_final.csv"
+df = pd.read_csv(CSV_PATH)
 
-# ✅ Google Drive file IDs for models (v2)
+# ✅ Google Drive file IDs for models
 gdrive_files = {
     "flu_model_inf_a_v2.pkl": "1zTQjJV1Tdo_nCtpCM7rP8e6wIjEG_A7j",
     "flu_model_inf_all_v2.pkl": "15ZxnYML2SWJja5xTTouRo2GiN49Hr7XI",
@@ -51,14 +49,15 @@ models = {
     "otherrespvirus": joblib.load("flu_model_otherrespvirus_v2.pkl")
 }
 
-# Region encoding
+# ✅ Region encoding
 region_mapping = {
     'AFR': 0, 'AMR': 1, 'EMR': 2, 'EUR': 3, 'SEAR': 4, 'WPR': 5, 'Other': 6
 }
 
 @app.route("/data", methods=["GET"])
 def get_data():
-    data = list(collection.find({}, {"_id": 0}))
+    # Convert dataframe to JSON and return
+    data = df.to_dict(orient="records")
     return jsonify(data)
 
 @app.route("/predict", methods=["GET"])
@@ -100,6 +99,7 @@ def serve_react(path):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
