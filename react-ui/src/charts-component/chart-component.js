@@ -12,6 +12,7 @@ import {
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Legend, Tooltip);
 
+// Constants
 const fluTypes = ["inf_a", "inf_b", "inf_all", "rsv", "otherrespvirus"];
 const regions = ["AFR", "AMR", "EMR", "EUR", "SEAR", "WPR"];
 const fluColors = {
@@ -22,15 +23,15 @@ const fluColors = {
   otherrespvirus: "rgba(153, 102, 255, 0.6)"
 };
 
-// Utility: Random number between 100k and 3.5M
+// Utility for mock values
 const getRandomCases = () => Math.floor(Math.random() * (3500000 - 100000 + 1)) + 100000;
 
 const ChartComponent = () => {
   const [selectedFlu, setSelectedFlu] = useState("inf_a");
   const [selectedYear, setSelectedYear] = useState(2024);
   const [selectedWeek, setSelectedWeek] = useState(12);
-  const [data, setData] = useState({});
-  const [maxRegion, setMaxRegion] = useState("");
+  const [data, setData] = useState(null);
+  const [maxRegion, setMaxRegion] = useState("N/A");
   const [maxCases, setMaxCases] = useState(0);
 
   useEffect(() => {
@@ -53,11 +54,9 @@ const ChartComponent = () => {
     const max = Math.max(...regionData.map(r => r.cases));
     const maxRegionEntry = regionData.find(r => r.cases === max);
 
-    console.log("Generated mock data:", regionData);
-
     setData(chartData);
-    setMaxRegion(maxRegionEntry.region);
-    setMaxCases(max);
+    setMaxRegion(maxRegionEntry?.region || "N/A");
+    setMaxCases(max || 0);
   }, [selectedFlu, selectedYear, selectedWeek]);
 
   return (
@@ -97,27 +96,31 @@ const ChartComponent = () => {
       </div>
 
       {/* Chart */}
-      <Bar
-        data={data}
-        options={{
-          responsive: true,
-          plugins: {
-            legend: { display: true },
-            title: {
-              display: true,
-              text: `Cases of ${selectedFlu.toUpperCase()} by WHO Region`
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                precision: 0
+      {data ? (
+        <Bar
+          data={data}
+          options={{
+            responsive: true,
+            plugins: {
+              legend: { display: true },
+              title: {
+                display: true,
+                text: `Cases of ${selectedFlu.toUpperCase()} by WHO Region`
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  precision: 0
+                }
               }
             }
-          }
-        }}
-      />
+          }}
+        />
+      ) : (
+        <p>Loading chart...</p>
+      )}
 
       {/* Summary */}
       <div style={{ marginTop: "30px", textAlign: "left" }}>
