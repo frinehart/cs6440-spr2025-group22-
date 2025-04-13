@@ -1,7 +1,6 @@
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from pymongo import MongoClient
-from urllib.parse import quote_plus
 import joblib
 import numpy as np
 import os
@@ -11,19 +10,10 @@ import requests
 app = Flask(__name__, static_folder="build", static_url_path="")
 CORS(app)
 
-# ✅ Use MongoDB Atlas SRV URI (Render-compatible)
-MONGO_USER = quote_plus(os.getenv("MONGO_USER", "fsrinehart"))
-MONGO_PASS = quote_plus(os.getenv("MONGO_PASS", "1Banana!"))
-MONGO_DBNAME = os.getenv("MONGO_DBNAME", "myDatabase")
-
-MONGO_URI = (
-    f"mongodb+srv://{MONGO_USER}:{MONGO_PASS}"
-    "@cluster0.bwalegq.mongodb.net/"
-    f"{MONGO_DBNAME}?retryWrites=true&w=majority&appName=Cluster0"
-)
-
+# ✅ Use direct MongoDB connection string (from MONGO_URI env var)
+MONGO_URI = os.getenv("MONGO_URI")
 client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
-db = client[MONGO_DBNAME]
+db = client["myDatabase"]
 collection = db["myCollection"]
 
 # ✅ Google Drive file IDs for models (v2)
@@ -110,6 +100,7 @@ def serve_react(path):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
