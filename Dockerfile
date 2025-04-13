@@ -1,37 +1,34 @@
-# ---------------------
-# STEP 1: Build React frontend
-# ---------------------
-    FROM node:18 AS frontend
+# Stage 1: Build React frontend
+FROM node:18 as build
 
-    WORKDIR /app/react-ui
-    COPY react-ui/package.json react-ui/package-lock.json ./
-    RUN npm install
-    
-    COPY react-ui/ ./
-    RUN npm run build
-    
-    # ---------------------
-    # STEP 2: Set up Flask backend
-    # ---------------------
-    FROM python:3.11-slim AS backend
-    
-    WORKDIR /app
-    
-    # Install Python dependencies
-    COPY backend/requirements.txt ./requirements.txt
-    RUN pip install --no-cache-dir -r requirements.txt
-    
-    # Copy Flask app
-    COPY backend/app.py ./app.py
-    
-    # Copy built React frontend from previous stage
-    COPY --from=frontend /app/react-ui/build ./build
-    
-    # Expose Flask port
-    EXPOSE 5000
-    
-    # Start Flask server
-    CMD ["python", "app.py"]
+WORKDIR /app
+COPY react-ui/package.json react-ui/package-lock.json ./
+RUN npm install
+
+COPY react-ui ./react-ui
+RUN npm run --prefix react-ui build
+
+# Stage 2: Serve with Flask
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install Python deps
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy Flask app
+COPY app.py ./
+
+# Copy React build output
+COPY --from=build /app/react-ui/build ./build
+
+# Expose port
+EXPOSE 5000
+
+# Start Flask
+CMD ["python", "app.py"]
+
 
 
 
