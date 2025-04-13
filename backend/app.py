@@ -1,10 +1,10 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 import random
 import os
 
-# ✅ Setup Flask app
-app = Flask(__name__)
+# ✅ Setup Flask app to serve React from 'build'
+app = Flask(__name__, static_folder="build", static_url_path="")
 CORS(app)
 
 # ✅ Constants
@@ -30,15 +30,20 @@ def get_mock_data():
 
     return jsonify(mock_data)
 
-# ✅ Optional root path
-@app.route("/")
-def home():
-    return "✅ Mock Flu API is running!"
+# ✅ Serve React frontend (index.html and static files)
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve_react(path):
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, "index.html")
 
-# ✅ Use PORT from environment (for Render)
+# ✅ Main entry
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(host="0.0.0.0", port=port)
+
 
 
 
