@@ -82,6 +82,11 @@ def serve_react(path):
     else:
         return send_from_directory(app.static_folder, "index.html")
 
+# ✅ Bind Flask to 0.0.0.0 for Render deployment
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
+
+
 
 
 
