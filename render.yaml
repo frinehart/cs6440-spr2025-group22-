@@ -4,8 +4,8 @@ services:
     env: docker
     plan: free
     region: oregon
-    dockerfilePath: Dockerfile         # ✅ Was backend/Dockerfile
-    dockerContext: .                   # ✅ We're using the root now
+    dockerfilePath: Dockerfile
+    dockerContext: .
     startCommand: "python app.py"
     healthCheckPath: /
 
@@ -14,10 +14,9 @@ services:
         value: production
       - key: PORT
         value: 5000
-      - key: MONGO_USER
-        value: fsrinehart
-      - key: MONGO_PASS
-        value: 1Banana!
+      - key: MONGO_URI
+        value: mongodb://fsrinehart:1Banana%21@ac-jfcfzln-shard-00-00.bwalegq.mongodb.net:27017,ac-jfcfzln-shard-00-01.bwalegq.mongodb.net:27017,ac-jfcfzln-shard-00-02.bwalegq.mongodb.net:27017/myDatabase?ssl=true&replicaSet=atlas-5f3a0z-shard-0&authSource=admin&retryWrites=true&w=majority
+
 
 
 
