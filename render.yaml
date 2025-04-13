@@ -1,19 +1,39 @@
 services:
+  # ✅ FRONTEND – React Static Site Deployment
   - type: web
     name: cs6440-flu-dashboard
-    env: docker
+    env: static
     plan: free
     region: oregon
-    dockerfilePath: Dockerfile
-    dockerContext: .
-    startCommand: "python app.py"
-    healthCheckPath: /
 
-    envVars:
-      - key: FLASK_ENV
-        value: production
-      - key: PORT
-        value: 5000
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
+    rootDir: react-ui  # 📁 Make sure your React app is in this folder
+
+  # -------------------------------------------------------------
+  # ⬇️ BACKEND – Flask API + MongoDB (Commented out for now)
+  # Uncomment this section if you want to restore backend support
+  # -------------------------------------------------------------
+
+  # - type: web
+  #   name: cs6440-flu-backend
+  #   env: docker
+  #   plan: free
+  #   region: oregon
+  #   dockerfilePath: Dockerfile         # ✅ Was backend/Dockerfile
+  #   dockerContext: .                   # ✅ Using project root
+  #   startCommand: "python app.py"
+  #   healthCheckPath: /
+
+  #   envVars:
+  #     - key: FLASK_ENV
+  #       value: production
+  #     - key: PORT
+  #       value: 5000
+  #     - key: MONGO_USER
+  #       value: fsrinehart
+  #     - key: MONGO_PASS
+  #       value: 1Banana!
 
 
 
