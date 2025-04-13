@@ -33,16 +33,19 @@ const ChartComponent = () => {
   const [maxCases, setMaxCases] = useState(0);
 
   useEffect(() => {
-    // ✅ Only this line is changed
     axios.get('/data')
       .then((response) => {
         const entries = response.data;
+
+        // ✅ Fix: Coerce year/week to integers
         const filtered = entries.filter(
           (entry) =>
-            entry.iso_year === selectedYear &&
-            entry.iso_week === selectedWeek &&
+            parseInt(entry.iso_year) === selectedYear &&
+            parseInt(entry.iso_week) === selectedWeek &&
             entry.whoregion === selectedRegion
         );
+
+        console.log("🧪 Filtered results:", filtered);
 
         const regionalCounts = {};
         for (const entry of filtered) {
@@ -71,7 +74,7 @@ const ChartComponent = () => {
           .find((d) => d.label.toLowerCase() === selectedFlu)
           ?.data?.[0] ?? 0;
 
-        setMaxRegion(regionWithMax);
+        setMaxRegion(regionWithMax || "N/A");
         setMaxCases(max);
         setData(chartData);
       })
@@ -119,19 +122,25 @@ const ChartComponent = () => {
         </div>
       </div>
 
-      <Bar
-        data={data}
-        options={{
-          responsive: true,
-          plugins: {
-            legend: { display: true },
-            title: {
-              display: true,
-              text: `Cases of ${selectedFlu.toUpperCase()} by WHO Region`
+      {data.labels?.length === 0 ? (
+        <p style={{ textAlign: "center", marginTop: "20px" }}>
+          No data available for the selected filters.
+        </p>
+      ) : (
+        <Bar
+          data={data}
+          options={{
+            responsive: true,
+            plugins: {
+              legend: { display: true },
+              title: {
+                display: true,
+                text: `Cases of ${selectedFlu.toUpperCase()} by WHO Region`
+              }
             }
-          }
-        }}
-      />
+          }}
+        />
+      )}
 
       <div style={{ marginTop: "30px", textAlign: "left" }}>
         <h3>Dashboard Summary</h3>
@@ -147,6 +156,9 @@ const ChartComponent = () => {
     </div>
   );
 };
+
+export default ChartComponent;
+
 
 export default ChartComponent;
 
