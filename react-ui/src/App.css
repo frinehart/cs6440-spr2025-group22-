@@ -36,3 +36,25 @@
     transform: rotate(360deg);
   }
 }
+
+/* ✅ NEW: Ensure the chart displays properly */
+.chart-container {
+  height: 400px;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Optional: Make the whole app more responsive */
+input,
+select {
+  padding: 8px;
+  font-size: 1rem;
+}
+
+@media screen and (max-width: 768px) {
+  .chart-container {
+    height: 300px;
+  }
