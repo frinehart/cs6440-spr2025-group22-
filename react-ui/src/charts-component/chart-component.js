@@ -32,7 +32,8 @@ const ChartComponent = () => {
   const [regionData, setRegionData] = useState({});
 
   useEffect(() => {
-    axios.get('http://localhost:5000/data')
+    // ✅ FIX: Use relative path so it works in Render too
+    axios.get('/data')
       .then(response => {
         const regionsSet = new Set();
         const regionFluMap = {};
@@ -41,117 +42,45 @@ const ChartComponent = () => {
           const region = entry.whoregion;
           regionsSet.add(region);
           if (!regionFluMap[region]) {
-            regionFluMap[region] = { inf_a: 0, inf_b: 0, inf_all: 0, rsv: 0, otherrespvirus: 0 };
+            regionFluMap[region] = {
+              inf_a: 0,
+              inf_b: 0,
+              inf_all: 0,
+              rsv: 0,
+              otherrespvirus: 0
+            };
           }
           fluTypes.forEach(flu => {
-            if (entry[flu]) {
+            if (entry[flu] !== undefined) {
               regionFluMap[region][flu] += entry[flu];
             }
           });
         });
 
-        setLabels(Array.from(regionsSet));
+        setLabels([...regionsSet]);
         setRegionData(regionFluMap);
       })
-      .catch(error => console.error("Error fetching data:", error));
+      .catch(error => {
+        console.error("Error fetching data:", error);
+      });
   }, []);
 
-  const selectedData = labels.map(region => regionData[region]?.[selectedFlu] || 0);
-  const maxCases = Math.max(...selectedData);
-  const maxRegion = labels[selectedData.indexOf(maxCases)] || "N/A";
-
-  const data = {
+  const chartData = {
     labels,
-    datasets: [
-      {
-        label: `Total ${selectedFlu.toUpperCase()} cases by WHO Region`,
-        data: selectedData,
-        backgroundColor: fluColors[selectedFlu]
-      }
-    ]
+    datasets: fluTypes.map(flu => ({
+      label: flu.toUpperCase(),
+      data: labels.map(region => regionData[region]?.[flu] || 0),
+      backgroundColor: fluColors[flu]
+    }))
   };
 
-  return (
-    <div style={{ maxWidth: "1000px", margin: "auto" }}>
-      <h2>Flu Cases by WHO Region</h2>
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top"
+      },
+      title: {
+        display: true,
 
-      <div style={{ display: "flex", gap: "15px", flexWrap: "wrap", marginBottom: "20px" }}>
-        <div>
-          <label>Flu Type:</label><br />
-          <select value={selectedFlu} onChange={(e) => setSelectedFlu(e.target.value)}>
-            {fluTypes.map(type => (
-              <option key={type} value={type}>{type}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label>Region:</label><br />
-          <select value={selectedRegion} onChange={(e) => setSelectedRegion(e.target.value)}>
-            {regions.map(region => (
-              <option key={region} value={region}>{region}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label>Year:</label><br />
-          <input
-            type="number"
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-            min={2000} max={2100}
-          />
-        </div>
-        <div>
-          <label>Week:</label><br />
-          <input
-            type="number"
-            value={selectedWeek}
-            onChange={(e) => setSelectedWeek(parseInt(e.target.value))}
-            min={1} max={52}
-          />
-        </div>
-      </div>
-
-      <div style={{ marginBottom: "20px" }}>
-        <strong>Flu Type Color Legend:</strong>
-        <div style={{ display: "flex", gap: "15px", marginTop: "8px" }}>
-          {Object.entries(fluColors).map(([type, color]) => (
-            <div key={type} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <div style={{ width: "16px", height: "16px", backgroundColor: color, borderRadius: "3px" }}></div>
-              <span>{type}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <Bar
-        data={data}
-        options={{
-          responsive: true,
-          plugins: {
-            legend: { display: true },
-            title: {
-              display: true,
-              text: `Cases of ${selectedFlu.toUpperCase()} by WHO Region`
-            }
-          }
-        }}
-      />
-
-      <div style={{ marginTop: "30px", textAlign: "left" }}>
-        <h3>Dashboard Summary</h3>
-        <p>
-          Based on the selected criteria (<strong>{selectedFlu.toUpperCase()}</strong> - Week <strong>{selectedWeek}</strong>, <strong>{selectedYear}</strong>),
-          the <strong>{maxRegion}</strong> region has the highest number of reported cases: <strong>{maxCases.toLocaleString()}</strong>.
-        </p>
-        <p>
-          Use the dropdowns above to view trends by flu type, region, week, and year. The chart updates automatically, and
-          the color-coded legend below helps identify the data at a glance.
-        </p>
-      </div>
-    </div>
-  );
-};
-
-export default ChartComponent;
 
