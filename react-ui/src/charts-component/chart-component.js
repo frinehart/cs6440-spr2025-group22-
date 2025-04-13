@@ -160,7 +160,4 @@ const ChartComponent = () => {
 export default ChartComponent;
 
 
-export default ChartComponent;
-
-
 
