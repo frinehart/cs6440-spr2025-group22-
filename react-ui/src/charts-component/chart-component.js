@@ -28,59 +28,127 @@ const ChartComponent = () => {
   const [selectedRegion, setSelectedRegion] = useState("AMR");
   const [selectedYear, setSelectedYear] = useState(2024);
   const [selectedWeek, setSelectedWeek] = useState(12);
-  const [labels, setLabels] = useState([]);
-  const [regionData, setRegionData] = useState({});
+  const [data, setData] = useState({});
+  const [maxRegion, setMaxRegion] = useState("");
+  const [maxCases, setMaxCases] = useState(0);
 
   useEffect(() => {
-    // ✅ FIX: Use relative path so it works in Render too
+    // ✅ Only this line is changed
     axios.get('/data')
-      .then(response => {
-        const regionsSet = new Set();
-        const regionFluMap = {};
+      .then((response) => {
+        const entries = response.data;
+        const filtered = entries.filter(
+          (entry) =>
+            entry.iso_year === selectedYear &&
+            entry.iso_week === selectedWeek &&
+            entry.whoregion === selectedRegion
+        );
 
-        response.data.forEach(entry => {
-          const region = entry.whoregion;
-          regionsSet.add(region);
-          if (!regionFluMap[region]) {
-            regionFluMap[region] = {
-              inf_a: 0,
-              inf_b: 0,
-              inf_all: 0,
-              rsv: 0,
-              otherrespvirus: 0
-            };
+        const regionalCounts = {};
+        for (const entry of filtered) {
+          if (!regionalCounts[entry.whoregion]) {
+            regionalCounts[entry.whoregion] = {};
+            fluTypes.forEach((flu) => {
+              regionalCounts[entry.whoregion][flu] = 0;
+            });
           }
-          fluTypes.forEach(flu => {
-            if (entry[flu] !== undefined) {
-              regionFluMap[region][flu] += entry[flu];
-            }
+          fluTypes.forEach((flu) => {
+            regionalCounts[entry.whoregion][flu] += entry[flu];
           });
-        });
+        }
 
-        setLabels([...regionsSet]);
-        setRegionData(regionFluMap);
+        const chartData = {
+          labels: Object.keys(regionalCounts),
+          datasets: fluTypes.map((flu) => ({
+            label: flu.toUpperCase(),
+            data: Object.values(regionalCounts).map((region) => region[flu]),
+            backgroundColor: fluColors[flu]
+          }))
+        };
+
+        const regionWithMax = chartData.labels[0];
+        const max = chartData.datasets
+          .find((d) => d.label.toLowerCase() === selectedFlu)
+          ?.data?.[0] ?? 0;
+
+        setMaxRegion(regionWithMax);
+        setMaxCases(max);
+        setData(chartData);
       })
-      .catch(error => {
-        console.error("Error fetching data:", error);
+      .catch((err) => {
+        console.error("Error loading data:", err);
       });
-  }, []);
+  }, [selectedFlu, selectedRegion, selectedYear, selectedWeek]);
 
-  const chartData = {
-    labels,
-    datasets: fluTypes.map(flu => ({
-      label: flu.toUpperCase(),
-      data: labels.map(region => regionData[region]?.[flu] || 0),
-      backgroundColor: fluColors[flu]
-    }))
-  };
+  return (
+    <div style={{ padding: "20px", border: "1px solid #ccc", borderRadius: "8px", marginTop: "30px" }}>
+      <div style={{ marginBottom: "20px", display: "flex", gap: "10px", justifyContent: "center" }}>
+        <select value={selectedFlu} onChange={(e) => setSelectedFlu(e.target.value)}>
+          {fluTypes.map((flu) => (
+            <option key={flu} value={flu}>{flu.toUpperCase()}</option>
+          ))}
+        </select>
+        <select value={selectedRegion} onChange={(e) => setSelectedRegion(e.target.value)}>
+          {regions.map((region) => (
+            <option key={region} value={region}>{region}</option>
+          ))}
+        </select>
+        <input
+          type="number"
+          value={selectedYear}
+          onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+          min={2000} max={2030}
+        />
+        <input
+          type="number"
+          value={selectedWeek}
+          onChange={(e) => setSelectedWeek(parseInt(e.target.value))}
+          min={1} max={52}
+        />
+      </div>
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top"
-      },
-      title: {
-        display: true,
+      <div style={{ marginBottom: "20px" }}>
+        <strong>Flu Type Color Legend:</strong>
+        <div style={{ display: "flex", gap: "15px", marginTop: "8px" }}>
+          {Object.entries(fluColors).map(([type, color]) => (
+            <div key={type} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <div style={{ width: "16px", height: "16px", backgroundColor: color, borderRadius: "3px" }}></div>
+              <span>{type}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <Bar
+        data={data}
+        options={{
+          responsive: true,
+          plugins: {
+            legend: { display: true },
+            title: {
+              display: true,
+              text: `Cases of ${selectedFlu.toUpperCase()} by WHO Region`
+            }
+          }
+        }}
+      />
+
+      <div style={{ marginTop: "30px", textAlign: "left" }}>
+        <h3>Dashboard Summary</h3>
+        <p>
+          Based on the selected criteria (<strong>{selectedFlu.toUpperCase()}</strong> - Week <strong>{selectedWeek}</strong>, <strong>{selectedYear}</strong>),
+          the <strong>{maxRegion}</strong> region has the highest number of reported cases: <strong>{maxCases.toLocaleString()}</strong>.
+        </p>
+        <p>
+          Use the dropdowns above to view trends by flu type, region, week, and year. The chart updates automatically, and
+          the color-coded legend below helps identify the data at a glance.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default ChartComponent;
+
 
 
