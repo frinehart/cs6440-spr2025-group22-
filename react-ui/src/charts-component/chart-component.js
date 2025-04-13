@@ -12,7 +12,6 @@ import {
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Legend, Tooltip);
 
-// Flu types and regions
 const fluTypes = ["inf_a", "inf_b", "inf_all", "rsv", "otherrespvirus"];
 const regions = ["AFR", "AMR", "EMR", "EUR", "SEAR", "WPR"];
 const fluColors = {
@@ -23,9 +22,8 @@ const fluColors = {
   otherrespvirus: "rgba(153, 102, 255, 0.6)"
 };
 
-// Helper to generate random numbers within a range
-const getRandomInt = (min, max) =>
-  Math.floor(Math.random() * (max - min + 1)) + min;
+// Utility: Random number between 100k and 3.5M
+const getRandomCases = () => Math.floor(Math.random() * (3500000 - 100000 + 1)) + 100000;
 
 const ChartComponent = () => {
   const [selectedFlu, setSelectedFlu] = useState("inf_a");
@@ -36,30 +34,30 @@ const ChartComponent = () => {
   const [maxCases, setMaxCases] = useState(0);
 
   useEffect(() => {
-    // Simulate flu case totals for each region
-    const regionTotals = {};
-    regions.forEach(region => {
-      regionTotals[region] = getRandomInt(100000, 3500000); // make it look realistic
-    });
+    const regionData = regions.map(region => ({
+      region,
+      cases: getRandomCases()
+    }));
 
     const chartData = {
-      labels: regions,
+      labels: regionData.map(r => r.region),
       datasets: [
         {
           label: `Total ${selectedFlu.toUpperCase()} cases by WHO Region`,
-          data: regions.map(region => regionTotals[region]),
+          data: regionData.map(r => r.cases),
           backgroundColor: fluColors[selectedFlu]
         }
       ]
     };
 
-    const max = Math.max(...chartData.datasets[0].data);
-    const maxRegionIndex = chartData.datasets[0].data.indexOf(max);
-    const regionWithMax = chartData.labels[maxRegionIndex];
+    const max = Math.max(...regionData.map(r => r.cases));
+    const maxRegionEntry = regionData.find(r => r.cases === max);
 
-    setMaxRegion(regionWithMax || "N/A");
-    setMaxCases(max);
+    console.log("Generated mock data:", regionData);
+
     setData(chartData);
+    setMaxRegion(maxRegionEntry.region);
+    setMaxCases(max);
   }, [selectedFlu, selectedYear, selectedWeek]);
 
   return (
