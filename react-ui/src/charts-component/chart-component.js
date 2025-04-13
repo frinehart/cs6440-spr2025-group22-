@@ -33,11 +33,12 @@ const ChartComponent = () => {
   const [maxCases, setMaxCases] = useState(0);
 
   useEffect(() => {
+    // ✅ Corrected fetch URL for Render
     axios.get('/data')
       .then((response) => {
         const entries = response.data;
 
-        // ✅ Fix: Coerce year/week to integers
+        // ✅ Filter data using numeric year/week comparison
         const filtered = entries.filter(
           (entry) =>
             parseInt(entry.iso_year) === selectedYear &&
@@ -158,6 +159,8 @@ const ChartComponent = () => {
 };
 
 export default ChartComponent;
+
+
 
 
 
