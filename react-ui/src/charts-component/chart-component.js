@@ -25,7 +25,6 @@ const fluColors = {
 
 const ChartComponent = () => {
   const [selectedFlu, setSelectedFlu] = useState("inf_a");
-  const [selectedRegion, setSelectedRegion] = useState("AMR");
   const [selectedYear, setSelectedYear] = useState(2024);
   const [selectedWeek, setSelectedWeek] = useState(12);
   const [data, setData] = useState({});
@@ -39,39 +38,35 @@ const ChartComponent = () => {
       .then((response) => {
         const entries = response.data;
 
+        // ✅ Filter only by year and week (get all regions)
         const filtered = entries.filter(
           (entry) =>
             parseInt(entry.iso_year) === selectedYear &&
-            parseInt(entry.iso_week) === selectedWeek &&
-            entry.whoregion === selectedRegion
+            parseInt(entry.iso_week) === selectedWeek
         );
 
-        const regionalCounts = {};
+        // ✅ Group totals by region
+        const regionTotals = {};
         for (const entry of filtered) {
-          if (!regionalCounts[entry.whoregion]) {
-            regionalCounts[entry.whoregion] = {};
-            fluTypes.forEach((flu) => {
-              regionalCounts[entry.whoregion][flu] = 0;
-            });
-          }
-          fluTypes.forEach((flu) => {
-            regionalCounts[entry.whoregion][flu] += entry[flu];
-          });
+          const region = entry.whoregion;
+          if (!regionTotals[region]) regionTotals[region] = 0;
+          regionTotals[region] += entry[selectedFlu] || 0;
         }
 
         const chartData = {
-          labels: Object.keys(regionalCounts),
-          datasets: fluTypes.map((flu) => ({
-            label: flu.toUpperCase(),
-            data: Object.values(regionalCounts).map((region) => region[flu]),
-            backgroundColor: fluColors[flu]
-          }))
+          labels: regions,
+          datasets: [
+            {
+              label: `Total ${selectedFlu.toUpperCase()} cases by WHO Region`,
+              data: regions.map((r) => regionTotals[r] || 0),
+              backgroundColor: fluColors[selectedFlu]
+            }
+          ]
         };
 
-        const regionWithMax = chartData.labels[0];
-        const max = chartData.datasets
-          .find((d) => d.label.toLowerCase() === selectedFlu)
-          ?.data?.[0] ?? 0;
+        const max = Math.max(...chartData.datasets[0].data);
+        const maxRegionIndex = chartData.datasets[0].data.indexOf(max);
+        const regionWithMax = chartData.labels[maxRegionIndex];
 
         setMaxRegion(regionWithMax || "N/A");
         setMaxCases(max);
@@ -80,7 +75,7 @@ const ChartComponent = () => {
       .catch((err) => {
         console.error("❌ Error loading data:", err);
       });
-  }, [selectedFlu, selectedRegion, selectedYear, selectedWeek]);
+  }, [selectedFlu, selectedYear, selectedWeek]);
 
   return (
     <div style={{ padding: "20px", border: "1px solid #ccc", borderRadius: "8px", marginTop: "30px" }}>
@@ -88,11 +83,6 @@ const ChartComponent = () => {
         <select value={selectedFlu} onChange={(e) => setSelectedFlu(e.target.value)}>
           {fluTypes.map((flu) => (
             <option key={flu} value={flu}>{flu.toUpperCase()}</option>
-          ))}
-        </select>
-        <select value={selectedRegion} onChange={(e) => setSelectedRegion(e.target.value)}>
-          {regions.map((region) => (
-            <option key={region} value={region}>{region}</option>
           ))}
         </select>
         <input
@@ -165,6 +155,7 @@ const ChartComponent = () => {
 };
 
 export default ChartComponent;
+
 
 
 
