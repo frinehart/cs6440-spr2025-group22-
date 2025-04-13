@@ -4,7 +4,6 @@ import pandas as pd
 import joblib
 import numpy as np
 import os
-import requests
 
 # ✅ Serve from React build directory
 app = Flask(__name__, static_folder="build", static_url_path="")
@@ -14,34 +13,20 @@ CORS(app)
 CSV_PATH = "data/VIW_FNT_final.csv"
 df = pd.read_csv(CSV_PATH)
 
-# ✅ Google Drive file IDs for models
-gdrive_files = {
-    "flu_model_inf_a_v2.pkl": "1zTQjJV1Tdo_nCtpCM7rP8e6wIjEG_A7j",
-    "flu_model_inf_all_v2.pkl": "15ZxnYML2SWJja5xTTouRo2GiN49Hr7XI",
-    "flu_model_inf_b_v2.pkl": "1gtBlaikJU9NXCMO71srohiWnnVJx-xq3",
-    "flu_model_otherrespvirus_v2.pkl": "1jryMeOAlaq8xQqkRhF-H2Us3Ck8MQWmh",
-    "flu_model_rsv_v2.pkl": "14rHJg2GZCHPzjsCeBdXKw1nNF3KMmclG"
+# ✅ Load models from pre-downloaded files (handled in Docker build)
+models = {}
+model_files = {
+    "inf_a": "flu_model_inf_a_v2.pkl",
+    "inf_all": "flu_model_inf_all_v2.pkl",
+    "inf_b": "flu_model_inf_b_v2.pkl",
+    "otherrespvirus": "flu_model_otherrespvirus_v2.pkl",
+    "rsv": "flu_model_rsv_v2.pkl"
 }
 
-def download_model_file(filename, file_id):
-    """Download file from Google Drive if not cached."""
-    if not os.path.exists(filename):
-        print(f"📥 Downloading {filename}...")
-        url = f"https://drive.google.com/uc?export=download&id={file_id}"
-        response = requests.get(url, allow_redirects=True)
-        if response.status_code == 200:
-            with open(filename, 'wb') as f:
-                f.write(response.content)
-            print(f"✅ Downloaded {filename}")
-        else:
-            raise Exception(f"❌ Failed to download {filename} (status: {response.status_code})")
+for key, path in model_files.items():
+    models[key] = joblib.load(path)
 
-# ✅ Download and load models
-models = {}
-for fname, fid in gdrive_files.items():
-    download_model_file(fname, fid)
-    model_key = fname.replace("flu_model_", "").replace("_v2.pkl", "")
-    models[model_key] = joblib.load(fname)
+print("✅ All models loaded.")
 
 # ✅ Region encoding
 region_mapping = {
@@ -83,7 +68,7 @@ def predict_flu_cases():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# ✅ Optional data API route (if you want to serve raw data)
+# ✅ Optional data API route
 @app.route("/data", methods=["GET"])
 def get_data():
     return df.to_json(orient="records")
@@ -96,6 +81,7 @@ def serve_react(path):
         return send_from_directory(app.static_folder, path)
     else:
         return send_from_directory(app.static_folder, "index.html")
+
 
 
 
