@@ -30,6 +30,7 @@ RUN npm install && npm run build
 # ------------------------------
 WORKDIR /app
 COPY backend/ ./backend/
+COPY backend/data/ ./data/
 COPY backend/requirements.txt ./requirements.txt
 
 # ✅ Download models directly into backend folder
