@@ -4,8 +4,13 @@ FROM python:3.11-slim
 # Set working directory inside container
 WORKDIR /app
 
-# Install system dependencies for Node + Python
-RUN apt-get update && apt-get install -y curl gnupg && rm -rf /var/lib/apt/lists/*
+# Install system dependencies for Node + Python + pandas dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg \
+    build-essential \
+    libatlas-base-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # ------------------------------
 # STEP 1: Build React frontend
@@ -21,8 +26,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
 # STEP 2: Back to backend
 # ------------------------------
 WORKDIR /app
-COPY backend/ ./
-COPY backend/requirements.txt ./
+COPY backend/ ./                 # includes app.py and data folder
+COPY backend/requirements.txt ./  # needed for pip install
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 # ------------------------------
@@ -30,3 +36,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 # ------------------------------
 EXPOSE 5000
 CMD ["python", "app.py"]
+
