@@ -26,15 +26,6 @@ RUN npm install && npm run build
 # STEP 2: Set up backend (Flask)
 # ------------------------------
 WORKDIR /app
-COPY backend/ ./                 # includes app.py, models, data/
-COPY backend/requirements.txt ./  # needed for pip install
 
-RUN pip install --no-cache-dir -r requirements.txt
-
-# ------------------------------
-# STEP 3: Final setup
-# ------------------------------
-EXPOSE 5000
-CMD ["python", "app.py"]
 
 
