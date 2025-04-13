@@ -12,7 +12,7 @@ CORS(app)
 
 # ✅ Load CSV file into memory
 CSV_PATH = "data/VIW_FNT_final.csv"
-df = pd.read_csv("data/VIW_FNT_final.csv")
+df = pd.read_csv(CSV_PATH)
 
 # ✅ Google Drive file IDs for models
 gdrive_files = {
@@ -36,29 +36,22 @@ def download_model_file(filename, file_id):
         else:
             raise Exception(f"❌ Failed to download {filename} (status: {response.status_code})")
 
-# ✅ Download models if needed
+# ✅ Download and load models
+models = {}
 for fname, fid in gdrive_files.items():
     download_model_file(fname, fid)
-
-# ✅ Load models
-models = {
-    "inf_a": joblib.load("flu_model_inf_a_v2.pkl"),
-    "inf_b": joblib.load("flu_model_inf_b_v2.pkl"),
-    "inf_all": joblib.load("flu_model_inf_all_v2.pkl"),
-    "rsv": joblib.load("flu_model_rsv_v2.pkl"),
-    "otherrespvirus": joblib.load("flu_model_otherrespvirus_v2.pkl")
-}
+    model_key = fname.replace("flu_model_", "").replace("_v2.pkl", "")
+    models[model_key] = joblib.load(fname)
 
 # ✅ Region encoding
 region_mapping = {
-    'AFR': 0, 'AMR': 1, 'EMR': 2, 'EUR': 3, 'SEAR': 4, 'WPR': 5, 'Other': 6
+    "AFR": 0,
+    "AMR": 1,
+    "EMR": 2,
+    "EUR": 3,
+    "SEAR": 4,
+    "WPR": 5
 }
-
-@app.route("/data", methods=["GET"])
-def get_data():
-    # Convert dataframe to JSON and return
-    data = df.to_dict(orient="records")
-    return jsonify(data)
 
 @app.route("/predict", methods=["GET"])
 def predict_flu_cases():
@@ -66,12 +59,14 @@ def predict_flu_cases():
         region = request.args.get('region', 'AMR')
         year = int(request.args.get('year', 2024))
         week = int(request.args.get('week', 12))
-        target = request.args.get('target', 'inf_a')
+
+        # ✅ Support both "target" and "flu_type" parameters
+        target = request.args.get('target') or request.args.get('flu_type') or 'inf_a'
 
         if region not in region_mapping:
             return jsonify({'error': 'Invalid region'}), 400
         if target not in models:
-            return jsonify({'error': 'Invalid prediction target'}), 400
+            return jsonify({'error': f'Invalid prediction target: {target}'}), 400
 
         region_code = region_mapping[region]
         features = np.array([[year, week, region_code]])
@@ -88,7 +83,12 @@ def predict_flu_cases():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# ✅ Serve the React frontend
+# ✅ Optional data API route (if you want to serve raw data)
+@app.route("/data", methods=["GET"])
+def get_data():
+    return df.to_json(orient="records")
+
+# ✅ Serve React frontend
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def serve_react(path):
@@ -97,8 +97,6 @@ def serve_react(path):
     else:
         return send_from_directory(app.static_folder, "index.html")
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
 
 
 
