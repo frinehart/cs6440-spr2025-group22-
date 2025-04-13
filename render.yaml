@@ -4,10 +4,9 @@ services:
     env: docker
     plan: free
     region: oregon
-    dockerfilePath: Dockerfile
-    dockerContext: .
-    startCommand: "python backend/app.py"
-
+    dockerfilePath: Dockerfile         # ✅ Was backend/Dockerfile
+    dockerContext: .                   # ✅ We're using the root now
+    startCommand: "python app.py"
     healthCheckPath: /
 
     envVars:
@@ -16,8 +15,9 @@ services:
       - key: PORT
         value: 5000
       - key: MONGO_USER
-        value: fsrinehart  # Replace if you change the MongoDB Atlas username
+        value: fsrinehart
       - key: MONGO_PASS
-        value: 1Banana!     # Store the real password securely on Render's dashboard
+        value: 1Banana!
+
 
 
