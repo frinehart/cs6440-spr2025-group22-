@@ -38,7 +38,7 @@ const ChartComponent = () => {
       .then((response) => {
         const entries = response.data;
 
-        // ✅ Filter only by year and week (get all regions)
+        // ✅ Filter by year/week only
         const filtered = entries.filter(
           (entry) =>
             parseInt(entry.iso_year) === selectedYear &&
@@ -50,8 +50,13 @@ const ChartComponent = () => {
         for (const entry of filtered) {
           const region = entry.whoregion;
           if (!regionTotals[region]) regionTotals[region] = 0;
-          regionTotals[region] += entry[selectedFlu] || 0;
+
+          regionTotals[region] += parseInt(entry[selectedFlu]) || 0;
         }
+
+        // 🔍 Optional: debug logs
+        // console.log("🧪 Filtered:", filtered);
+        // console.log("📊 Region Totals:", regionTotals);
 
         const chartData = {
           labels: regions,
@@ -155,6 +160,7 @@ const ChartComponent = () => {
 };
 
 export default ChartComponent;
+
 
 
 
