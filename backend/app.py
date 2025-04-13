@@ -12,7 +12,7 @@ CORS(app)
 
 # ✅ Load CSV file into memory
 CSV_PATH = "data/VIW_FNT_final.csv"
-df = pd.read_csv(CSV_PATH)
+df = pd.read_csv("data/VIW_FNT_final.csv")
 
 # ✅ Google Drive file IDs for models
 gdrive_files = {
