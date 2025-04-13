@@ -22,7 +22,6 @@ const fluColors = {
   otherrespvirus: "rgba(153, 102, 255, 0.6)"
 };
 
-// Utility for mock values
 const getRandomCases = () => Math.floor(Math.random() * (3500000 - 100000 + 1)) + 100000;
 
 const ChartComponent = () => {
@@ -53,8 +52,6 @@ const ChartComponent = () => {
     const max = Math.max(...regionData.map(r => r.cases));
     const maxRegionEntry = regionData.find(r => r.cases === max);
 
-    console.log("🧪 Mock Chart Data:", chartData);  // 👈 You can see this in browser console
-
     setData(chartData);
     setMaxRegion(maxRegionEntry?.region || "N/A");
     setMaxCases(max || 0);
@@ -62,31 +59,38 @@ const ChartComponent = () => {
 
   return (
     <div style={{ padding: "20px", border: "1px solid #ccc", borderRadius: "8px", marginTop: "30px" }}>
-      {/* Filters */}
-      <div style={{ marginBottom: "20px", display: "flex", gap: "10px", justifyContent: "center" }}>
-        <select value={selectedFlu} onChange={(e) => setSelectedFlu(e.target.value)}>
-          {fluTypes.map((flu) => (
-            <option key={flu} value={flu}>{flu.toUpperCase()}</option>
-          ))}
-        </select>
-        <input
-          type="number"
-          value={selectedYear}
-          onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-          min={2000} max={2030}
-        />
-        <input
-          type="number"
-          value={selectedWeek}
-          onChange={(e) => setSelectedWeek(parseInt(e.target.value))}
-          min={1} max={52}
-        />
+      <div style={{ marginBottom: "20px", display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap" }}>
+        <div>
+          <label>Flu Type:</label><br />
+          <select value={selectedFlu} onChange={(e) => setSelectedFlu(e.target.value)}>
+            {fluTypes.map((flu) => (
+              <option key={flu} value={flu}>{flu.toUpperCase()}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label>Year:</label><br />
+          <input
+            type="number"
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+            min={2000} max={2030}
+          />
+        </div>
+        <div>
+          <label>Week:</label><br />
+          <input
+            type="number"
+            value={selectedWeek}
+            onChange={(e) => setSelectedWeek(parseInt(e.target.value))}
+            min={1} max={52}
+          />
+        </div>
       </div>
 
-      {/* Legend */}
       <div style={{ marginBottom: "20px" }}>
         <strong>Flu Type Color Legend:</strong>
-        <div style={{ display: "flex", gap: "15px", marginTop: "8px", justifyContent: "center" }}>
+        <div style={{ display: "flex", gap: "15px", marginTop: "8px", justifyContent: "center", flexWrap: "wrap" }}>
           {Object.entries(fluColors).map(([type, color]) => (
             <div key={type} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <div style={{ width: "16px", height: "16px", backgroundColor: color, borderRadius: "3px" }}></div>
@@ -96,9 +100,8 @@ const ChartComponent = () => {
         </div>
       </div>
 
-      {/* Chart */}
-      {data && data.datasets[0].data.length > 0 ? (
-        <div style={{ width: "100%", maxWidth: "1000px", margin: "0 auto" }}>
+      {data ? (
+        <div style={{ width: "90%", maxWidth: "1000px", margin: "auto" }}>
           <Bar
             data={data}
             options={{
@@ -125,8 +128,7 @@ const ChartComponent = () => {
         <p>Loading chart...</p>
       )}
 
-      {/* Summary */}
-      <div style={{ marginTop: "30px", textAlign: "left" }}>
+      <div style={{ marginTop: "30px", textAlign: "left", width: "90%", maxWidth: "1000px", marginInline: "auto" }}>
         <h3>Dashboard Summary</h3>
         <p>
           Based on the selected criteria (<strong>{selectedFlu.toUpperCase()}</strong> - Week <strong>{selectedWeek}</strong>, <strong>{selectedYear}</strong>),
