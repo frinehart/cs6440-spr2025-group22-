@@ -26,15 +26,17 @@ const fluColors = {
 const ChartComponent = () => {
   const [selectedFlu, setSelectedFlu] = useState("inf_a");
   const [selectedRegion, setSelectedRegion] = useState("AMR");
-  const [selectedYear, setSelectedYear] = useState(2017);
-  const [selectedWeek, setSelectedWeek] = useState(5);
+  const [selectedYear, setSelectedYear] = useState(2024);
+  const [selectedWeek, setSelectedWeek] = useState(12);
   const [data, setData] = useState({});
   const [maxRegion, setMaxRegion] = useState("");
   const [maxCases, setMaxCases] = useState(0);
 
   useEffect(() => {
-    // ✅ Correct path for Render & local
-    axios.get('/data')
+    // ✅ Dynamic base URL
+    const API_BASE = process.env.NODE_ENV === "production" ? "" : "http://localhost:5000";
+
+    axios.get(`${API_BASE}/data`)
       .then((response) => {
         const entries = response.data;
 
@@ -44,16 +46,6 @@ const ChartComponent = () => {
             parseInt(entry.iso_week) === selectedWeek &&
             entry.whoregion === selectedRegion
         );
-
-        console.log("🧪 Filtered entries:", filtered);
-        console.log("🧪 Flu values:", filtered.map(d => ({
-          region: d.whoregion,
-          inf_a: d.inf_a,
-          inf_b: d.inf_b,
-          inf_all: d.inf_all,
-          rsv: d.rsv,
-          otherrespvirus: d.otherrespvirus
-        })));
 
         const regionalCounts = {};
         for (const entry of filtered) {
@@ -87,7 +79,7 @@ const ChartComponent = () => {
         setData(chartData);
       })
       .catch((err) => {
-        console.error("❌ Error fetching data:", err);
+        console.error("❌ Error loading data:", err);
       });
   }, [selectedFlu, selectedRegion, selectedYear, selectedWeek]);
 
@@ -166,6 +158,7 @@ const ChartComponent = () => {
 };
 
 export default ChartComponent;
+
 
 
 
