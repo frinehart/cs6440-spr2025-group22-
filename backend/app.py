@@ -11,18 +11,15 @@ import requests
 app = Flask(__name__, static_folder="build", static_url_path="")
 CORS(app)
 
-# ✅ Connect to MongoDB Atlas using standard (non-SRV) URI with replicaSet
+# ✅ Use MongoDB Atlas SRV URI (Render-compatible)
 MONGO_USER = quote_plus(os.getenv("MONGO_USER", "fsrinehart"))
 MONGO_PASS = quote_plus(os.getenv("MONGO_PASS", "1Banana!"))
 MONGO_DBNAME = os.getenv("MONGO_DBNAME", "myDatabase")
 
 MONGO_URI = (
-    f"mongodb://{MONGO_USER}:{MONGO_PASS}"
-    "@ac-jfcfzln-shard-00-00.bwalegq.mongodb.net:27017,"
-    "ac-jfcfzln-shard-00-01.bwalegq.mongodb.net:27017,"
-    "ac-jfcfzln-shard-00-02.bwalegq.mongodb.net:27017/"
-    f"{MONGO_DBNAME}?ssl=true&replicaSet=atlas-68e760-shard-0"
-    "&authSource=admin&retryWrites=true&w=majority"
+    f"mongodb+srv://{MONGO_USER}:{MONGO_PASS}"
+    "@cluster0.bwalegq.mongodb.net/"
+    f"{MONGO_DBNAME}?retryWrites=true&w=majority&appName=Cluster0"
 )
 
 client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
@@ -113,6 +110,7 @@ def serve_react(path):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
