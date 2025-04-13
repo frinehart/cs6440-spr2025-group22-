@@ -12,7 +12,6 @@ import {
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Legend, Tooltip);
 
-// Constants
 const fluTypes = ["inf_a", "inf_b", "inf_all", "rsv", "otherrespvirus"];
 const regions = ["AFR", "AMR", "EMR", "EUR", "SEAR", "WPR"];
 const fluColors = {
@@ -54,6 +53,8 @@ const ChartComponent = () => {
     const max = Math.max(...regionData.map(r => r.cases));
     const maxRegionEntry = regionData.find(r => r.cases === max);
 
+    console.log("🧪 Mock Chart Data:", chartData);  // 👈 You can see this in browser console
+
     setData(chartData);
     setMaxRegion(maxRegionEntry?.region || "N/A");
     setMaxCases(max || 0);
@@ -85,7 +86,7 @@ const ChartComponent = () => {
       {/* Legend */}
       <div style={{ marginBottom: "20px" }}>
         <strong>Flu Type Color Legend:</strong>
-        <div style={{ display: "flex", gap: "15px", marginTop: "8px", flexWrap: "wrap", justifyContent: "center" }}>
+        <div style={{ display: "flex", gap: "15px", marginTop: "8px", justifyContent: "center" }}>
           {Object.entries(fluColors).map(([type, color]) => (
             <div key={type} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <div style={{ width: "16px", height: "16px", backgroundColor: color, borderRadius: "3px" }}></div>
@@ -96,13 +97,12 @@ const ChartComponent = () => {
       </div>
 
       {/* Chart */}
-      <div className="chart-container">
-        {data ? (
+      {data && data.datasets[0].data.length > 0 ? (
+        <div style={{ width: "100%", maxWidth: "1000px", margin: "0 auto" }}>
           <Bar
             data={data}
             options={{
               responsive: true,
-              maintainAspectRatio: false,
               plugins: {
                 legend: { display: true },
                 title: {
@@ -120,10 +120,10 @@ const ChartComponent = () => {
               }
             }}
           />
-        ) : (
-          <p>Loading chart...</p>
-        )}
-      </div>
+        </div>
+      ) : (
+        <p>Loading chart...</p>
+      )}
 
       {/* Summary */}
       <div style={{ marginTop: "30px", textAlign: "left" }}>
@@ -138,6 +138,7 @@ const ChartComponent = () => {
 };
 
 export default ChartComponent;
+
 
 
 
