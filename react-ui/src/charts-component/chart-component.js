@@ -33,7 +33,6 @@ const ChartComponent = () => {
   const [maxCases, setMaxCases] = useState(0);
 
   useEffect(() => {
-    // ✅ Dynamic base URL
     const API_BASE = process.env.NODE_ENV === "production" ? "" : "http://localhost:5000";
 
     axios.get(`${API_BASE}/data`)
@@ -136,6 +135,14 @@ const ChartComponent = () => {
               title: {
                 display: true,
                 text: `Cases of ${selectedFlu.toUpperCase()} by WHO Region`
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  precision: 0
+                }
               }
             }
           }}
